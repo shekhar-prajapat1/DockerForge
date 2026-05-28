@@ -8,10 +8,10 @@
 
 ```mermaid
 flowchart TD
-    subgraph Client[Frontend (Glassmorphic UI)]
+    subgraph Client["Frontend (Glassmorphic UI)"]
         UI[HTML/CSS/JS] -->|SSE events| API
     end
-    subgraph Backend[Express API (Node.js)]
+    subgraph Backend["Express API (Node.js)"]
         API[GET /api/forge] --> GitService
         API --> AnalysisService
         API --> LLMService
@@ -22,11 +22,9 @@ flowchart TD
     LLMService[llmService.js] -->|Gemini prompts| Gemini[Google Gemini API]
     DockerService[dockerService.js] -->|docker build/run| Docker[Docker Daemon]
     DockerService -->|verify| HealthCheck[HTTP ping]
-    LLMService -->|self‑heal
-| Repair Prompt
-    Repair[repairDockerConfig]
+    LLMService -->|self‑heal| Repair[repairDockerConfig]
     Repair --> DockerService
-    
+
     UI -->|user input (repo URL, API key)| API
     API -->|real‑time logs| UI
 ```
