@@ -25,7 +25,7 @@ flowchart TD
     LLMService -->|self‑heal| Repair[repairDockerConfig]
     Repair --> DockerService
 
-    UI -->|user input (repo URL, API key)| API
+    UI -->|"user input (repo URL, API key)"| API
     API -->|real‑time logs| UI
 ```
 
