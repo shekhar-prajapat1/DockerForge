@@ -1,0 +1,24 @@
+# Node.js dependencies
+node_modules/
+
+# Environment configuration files (should not be committed)
+.env
+.env.example
+
+# Logs & temporary files
+*.log
+logs/
+.temp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Build artefacts (if any)
+Dockerfile
+Dockerfile.*
+*.dockerignore
+
+# Misc
+.vscode/
+.idea/

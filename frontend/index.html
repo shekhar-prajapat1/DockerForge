@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DockerForge — AI-Powered Dockerfile Generator & Self-Healing Agent</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Generate optimized Dockerfiles and docker-compose configurations from any public GitHub repository. Features real-time build streaming and agentic self-healing diagnostics.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glows -->
+  <div class="glow-bg-1"></div>
+  <div class="glow-bg-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">🛠️</span>
+        <h1>Docker<span>Forge</span></h1>
+      </div>
+      <p class="tagline">AI-Powered Dockerfile Generator & Agentic Self-Healing Verifier</p>
+    </header>
+
+    <main class="app-main">
+      <!-- Input Panel -->
+      <section class="card input-card" id="settings-card">
+        <h2>Forge New Container</h2>
+        <p class="card-desc">Enter a public GitHub repository. Our agent will clone, scan, generate optimized configurations, and verify the builds in real-time.</p>
+        
+        <form id="forge-form" class="forge-form">
+          <div class="form-group">
+            <label for="repo-url">GitHub Repository URL</label>
+            <input type="url" id="repo-url" placeholder="https://github.com/username/repository" required autocomplete="off">
+          </div>
+          
+          <div class="form-group">
+            <label for="api-key">
+              Google Gemini API Key 
+              <span class="label-hint">(Optional if configured in .env)</span>
+            </label>
+            <div class="password-input-container">
+              <input type="password" id="api-key" placeholder="AIzaSy..." autocomplete="off">
+              <button type="button" id="toggle-key-visibility" class="btn-icon">👁️</button>
+            </div>
+            <span class="input-help">Your API key is never saved on servers. It is processed securely for LLM generation.</span>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary">
+            <span class="btn-text">Generate & Verify</span>
+            <span class="loader hidden"></span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Agent Workstation (Active Status & Progress) -->
+      <section class="card progress-card hidden" id="workstation-card">
+        <div class="workstation-header">
+          <h2>Agent Workstation</h2>
+          <div class="status-badge" id="agent-status-badge">
+            <span class="pulse-indicator gray" id="status-pulse"></span>
+            <span id="status-text">Idle</span>
+          </div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="steps-container">
+          <div class="step" id="step-clone">
+            <div class="step-icon">1</div>
+            <div class="step-info">
+              <h3>Clone</h3>
+              <p>Download Repository</p>
+            </div>
+          </div>
+          <div class="step" id="step-scan">
+            <div class="step-icon">2</div>
+            <div class="step-info">
+              <h3>Scan</h3>
+              <p>Analyze Frameworks</p>
+            </div>
+          </div>
+          <div class="step" id="step-generate">
+            <div class="step-icon">3</div>
+            <div class="step-info">
+              <h3>Generate</h3>
+              <p>AI Configuration</p>
+            </div>
+          </div>
+          <div class="step" id="step-build">
+            <div class="step-icon">4</div>
+            <div class="step-info">
+              <h3>Build</h3>
+              <p>Docker Compile</p>
+            </div>
+          </div>
+          <div class="step" id="step-heal">
+            <div class="step-icon">5</div>
+            <div class="step-info">
+              <h3>Self-Heal</h3>
+              <p>Agent Correction</p>
+            </div>
+          </div>
+          <div class="step" id="step-verify">
+            <div class="step-icon">6</div>
+            <div class="step-info">
+              <h3>Verify</h3>
+              <p>Container Run</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Terminal logs -->
+        <div class="terminal-container">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <span class="terminal-title">dockerforge@agent:~</span>
+            <button id="clear-terminal" class="btn-text-sm">Clear</button>
+          </div>
+          <div class="terminal-body" id="terminal-logs">
+            <div class="log-line system">Waiting for process initiation...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Successful Results Panel -->
+      <section class="card results-card hidden" id="results-card">
+        <div class="results-header">
+          <div class="success-banner">
+            <span class="success-icon">🎉</span>
+            <div>
+              <h2>Dockerfile Verified & Active!</h2>
+              <p id="success-port-info">The application container successfully booted and responded to local HTTP health check.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-layout">
+          <!-- Left side: Explanations -->
+          <div class="results-meta">
+            <h3>Architectural Decisions</h3>
+            <div class="explanation-box" id="llm-explanation">
+              Loading decisions...
+            </div>
+          </div>
+
+          <!-- Right side: Code viewer -->
+          <div class="code-viewer-panel">
+            <div class="tabs-header">
+              <button class="tab-btn active" id="tab-dockerfile" data-target="code-dockerfile">Dockerfile</button>
+              <button class="tab-btn" id="tab-compose" data-target="code-compose">docker-compose.yml</button>
+              <button class="btn btn-copy" id="btn-copy-code">
+                <span class="copy-icon">📋</span> Copy Code
+              </button>
+            </div>
+            
+            <div class="tab-content active" id="code-dockerfile-container">
+              <pre><code id="code-dockerfile" class="language-dockerfile">FROM node:alpine</code></pre>
+            </div>
+            
+            <div class="tab-content hidden" id="code-compose-container">
+              <pre><code id="code-compose" class="language-yaml">version: '3'</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>DockerForge — Full-Stack Agentic AI Engineering Assignment. Built with ❤️ and Gemini.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
